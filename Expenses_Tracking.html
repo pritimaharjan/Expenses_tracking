@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses_Tracking</title>
+    <style>
+        body{
+            display:flex;
+             justify-content: center;   
+        }
+        .main{
+           display: flex;
+           flex-direction: column;
+          justify-content: space-evenly;
+          margin-top: 30px;
+            background-color: #bfd9bf;
+            height:auto;
+            width: 800px;
+            border-radius: 10px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+        }
+        .container
+        {
+        text-align: center;
+        font-size: 30px;
+        
+        }
+        .summary
+        {
+         margin: 10px 40px 30px;
+         font-size: 20px;
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         text-align: right;
+        }
+        input[type="text"]
+        {
+            flex: 1;
+            padding: 8px ;
+        }
+        input[type="number"]{
+            flex: 1;
+            padding: 8px ;
+        }
+          button {
+      padding: 8px;
+      cursor: pointer;
+      background-color:	FFDEAD;
+    }
+    button:hover
+    {
+        background-color: cadetblue;
+        color: black;
+    }
+    h1{
+        text-align: center;
+    }
+    #expense_list li {
+      font-size: 18px;
+      margin: 10px 10px;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    </style>
+</head>
+<body>
+    <div class="main">
+       <h1>Expenses Tracking</h1>
+        <form class="container", id="form">
+            <input type="text" name="Description" placeholder="Description" id="description"/>
+            <input type="number" name="Amount" placeholder="Amount" id="amount"/>
+            <button type="submit">Add Expenses</button>
+        </form>
+        <ul id="expense_list"></ul>
+        <div class="summary">
+        Total:Rs<span id="total">0.00</span>
+        </div>
+     </div>
+    
+<script>
+    const Expenses_Tracking_form=document.getElementById("form");
+    const descriptionInput=document.getElementById("description");
+    const amountInput=document.getElementById("amount");
+    const expenseList = document.getElementById("expense_list");
+    const totalDisplay = document.getElementById("total");
+//Define localStorage
+     let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+     function saveExpenses() {
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+    }
+
+    function renderExpenses() {
+      expenseList.innerHTML = "";
+      let total = 0;
+
+      expenses.forEach((expense, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span>${expense.description} | ${expense.amount.toFixed(2)} | ${expense.date}</span>
+          <span class="actions">
+            <button onclick="editExpense(${i})">Edit</button>
+            <button onclick="deleteExpense(${i})">Delete</button>
+          </span>
+        `;
+        expenseList.appendChild(li);
+        total += expense.amount;
+      });
+      totalDisplay.textContent = total.toFixed(2);
+    }
+
+    Expenses_Tracking_form.addEventListener("submit",function(e){
+        e.preventDefault();
+        const description =descriptionInput.value.trim();
+        const amount=parseFloat(amountInput.value);
+
+        if(!description || isNaN(amount) || amount<=0)
+        {
+            alert("Enter positive amount");
+            return;
+        }
+        const expense={
+            description,
+            amount,
+            date:new Date().toLocaleDateString()
+            
+        }
+     
+    
+        expenses.push(expense);
+        saveExpenses();
+        renderExpenses();
+        Expenses_Tracking_form.reset();
+    });
+    
+    //delete option
+    window.deleteExpense=function(i)
+    {
+        expenses.splice(i,1);
+        saveExpenses();
+        renderExpenses();
+    };
+    
+     //editing option
+     window.editExpense=function(i){
+        const expense = expenses[i];
+        const newDescription = prompt("Edit Description:", expense.description)
+        const newAmount = parseFloat(prompt("Edit Amount",expense.amount))
+        if(!newDescription || isNaN(newAmount) || newAmount<=0)
+        {
+            alert("enter valid Description and amount")
+            return;
+        }
+        expenses[i].description=newDescription
+        expenses[i].amount=newAmount
+        saveExpenses();
+        renderExpenses();
+     };
+     renderExpenses();
+
+</script>
+</body>
+</html>
