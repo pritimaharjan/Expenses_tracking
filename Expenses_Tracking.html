@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Expense Tracking System</title>
     <style>
         .main{
@@ -17,10 +18,18 @@
            margin: 10px 10px;
             background-color: #008b8b;
             height: auto;
-            width: fit-content;
+            width: auto;
             color: black;
             box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
             border-radius: 10px;
+        }
+        .form{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            padding: 10px 10px;
+            margin: 5px 5px;
+            gap: 20px;
         }
         #description ,#amount
         {
@@ -69,19 +78,36 @@ color: antiquewhite;
             border: 1px;
             border-radius: 5px;
 }
+.piechart{
+    display: flex;
+    flex-direction: row;
+
+}
+canvas {
+  width: 350px !important;
+  height: 350px !important;
+  max-width: 350px;
+  max-height: 350px;
+  
+}
     </style>
 </head>
 <body>
     <div class="main">
+        
         <div class="container">
+            <h2 style="text-align: center; color:white">Expense Tracking from</h2>
 <form  id="form" class="form">
         <input type="Text" placeholder="Description" id="description">
         <input type="number" placeholder="Amount" id="amount">
-        <button type="submit">Add Expenses</button>
-        
+        <button type="submit" style="color:#9d9d9d; width:150px;">Add Expenses</button>
         <input type="text" id="search" placeholder="Search expenses...">
-        <ul id="expenses_list"></ul>
     </form>
+    <div class ="piechart">
+
+        <ul id="expenses_list"></ul>
+  <canvas id="expenseChart" width="350" height="350"></canvas>
+    </div>
     
      <div class="total">
         Total : Rs<span id="total">00.0</span>
@@ -133,6 +159,7 @@ color: antiquewhite;
   });
 
   totalDisplay.textContent = total.toFixed(2);
+  updateChart();
 }
 
        function downloadList(){
@@ -210,7 +237,55 @@ searchInput.addEventListener("input", function() {
   renderExpense(filtered);
 });
 
-        renderExpense();
+//chart
+let expenseChart;
+function updateChart()
+{
+    const labels = [] ;
+    const data = [] ;
+
+    storage.forEach(expense=>
+    {
+        const index = labels.indexOf(expense.description);
+        if (index ===-1){
+            labels.push(expense.description)
+            data.push(expense.amount)
+        }
+        else{
+            data[index]+=expense.amount;
+        }
+        
+    });
+     //if the chart is already exist,destroy before creating new.
+     if(expenseChart){
+        expenseChart.destroy();
+     }
+
+     const chart = document.getElementById("expenseChart").getContext("2d");
+     const colors = labels.map((_, i) => `hsl(${i * 40}, 70%, 50%)`);
+expenseChart = new Chart( chart,{
+    type :"pie",
+    data:{
+        labels:labels,
+        datasets:[{
+            data:data,
+            backgroundColor:colors,
+        }]
+        
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white" // This changes label text color
+          }
+        }
+      }
+    }
+    
+})
+}
+renderExpense();
     </script>
 </body>
 </html>
