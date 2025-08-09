@@ -30,10 +30,11 @@
             border-radius: 5px;
         }
         button{
-height: 30px;
+            height: 35px;
             padding: 3px;
             border: 1px;
             border-radius: 5px;
+           
             background-color: none;
         }
 .total{
@@ -62,6 +63,12 @@ color: antiquewhite;
 #edit, #delete{
     width: 80px;
 }
+#search{
+    height: 30px;
+            padding: 3px;
+            border: 1px;
+            border-radius: 5px;
+}
     </style>
 </head>
 <body>
@@ -71,9 +78,11 @@ color: antiquewhite;
         <input type="Text" placeholder="Description" id="description">
         <input type="number" placeholder="Amount" id="amount">
         <button type="submit">Add Expenses</button>
+        
+        <input type="text" id="search" placeholder="Search expenses...">
         <ul id="expenses_list"></ul>
-       
     </form>
+    
      <div class="total">
         Total : Rs<span id="total">00.0</span>
         </div>
@@ -97,25 +106,35 @@ color: antiquewhite;
        function saveExpense(){
         localStorage.setItem("storage",JSON.stringify(storage))
        } 
-       function renderExpense(){
-        expenseList.innerHTML= "";
-       let  total=0;
-        storage.forEach((expense,i) => {
-            const li = document.createElement("li");
-            li.innerHTML=`
-            <div class="expenses_list">
-                <div id="des"><span>${expense.description} </span><span>${expense.amount} </span><span> ${expense.date}</span></div>
-                <div id="button">
-                    <button onclick ="editExpense(${i})" id="edit">Edit</button>
-                    <button onclick ="deleteExpense(${i})" id="delete">Delete</button>
-                </div>
-            </div>
-            `;
-            expenseList.appendChild(li);
-            total+=expense.amount;
-        });
-        totalDisplay.textContent=total.toFixed(2);
-       }
+     function renderExpense(filteredData) {
+  // If no filteredData is provided, use the full storage array
+  const dataToRender = filteredData || storage;
+
+  expenseList.innerHTML = "";
+  let total = 0;
+
+  dataToRender.forEach((expense, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div class="expenses_list">
+        <div id="des">
+          <span>${expense.description}</span>
+          <span>${expense.amount}</span>
+          <span>${expense.date}</span>
+        </div>
+        <div id="button">
+          <button onclick="editExpense(${storage.indexOf(expense)})" id="edit">Edit</button>
+          <button onclick="deleteExpense(${storage.indexOf(expense)})" id="delete">Delete</button>
+        </div>
+      </div>
+    `;
+    expenseList.appendChild(li);
+    total += expense.amount;
+  });
+
+  totalDisplay.textContent = total.toFixed(2);
+}
+
        function downloadList(){
         let csv="Categories,Amount,Date\n" 
 
@@ -177,6 +196,20 @@ color: antiquewhite;
             renderExpense();
 
         }
+        const searchInput = document.getElementById("search");
+
+
+
+
+// Search filter
+searchInput.addEventListener("input", function() {
+  const searchText = searchInput.value.toLowerCase();
+  const filtered = storage.filter(expense => 
+    expense.description.toLowerCase().includes(searchText)
+  );
+  renderExpense(filtered);
+});
+
         renderExpense();
     </script>
 </body>
