@@ -3,162 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expenses_Tracking</title>
+    <title>Expense Tracking System</title>
     <style>
-        body{
-            display:flex;
-             justify-content: center;   
-        }
         .main{
-           display: flex;
-           flex-direction: column;
-          justify-content: space-evenly;
-          margin-top: 30px;
-            background-color: #bfd9bf;
-            height:auto;
-            width: 800px;
+            display: flex;
+            justify-content: center;
+        }
+        .container{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+           padding: 10px 10px;
+           margin: 10px 10px;
+            background-color: #008b8b;
+            height: auto;
+            width: fit-content;
+            color: black;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
             border-radius: 10px;
-            box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
         }
-        .container
+        #description ,#amount
         {
-        text-align: center;
-        font-size: 30px;
-        
+            height: 30px;
+            padding: 3px;
+            border: 1px;
+            border-radius: 5px;
         }
-        .summary
-        {
-         margin: 10px 40px 30px;
-         font-size: 20px;
-         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-         text-align: right;
+        button{
+height: 30px;
+            padding: 3px;
+            border: 1px;
+            border-radius: 5px;
+            background-color: none;
         }
-        input[type="text"]
-        {
-            flex: 1;
-            padding: 8px ;
-        }
-        input[type="number"]{
-            flex: 1;
-            padding: 8px ;
-        }
-          button {
-      padding: 8px;
-      cursor: pointer;
-      background-color:	FFDEAD;
-    }
-    button:hover
-    {
-        background-color: cadetblue;
-        color: black;
-    }
-    h1{
-        text-align: center;
-    }
-    #expense_list li {
-      font-size: 18px;
-      margin: 10px 10px;
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-    }
+.total{
+    display: flex;
+justify-content: flex-end;
+color: antiquewhite;
+
+}
+#des{
+     display: flex;
+    flex-direction: row;
+    color: aliceblue;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    
+}
+
+.expenses_list{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10px;
+     
+}
+#edit, #delete{
+    width: 80px;
+}
     </style>
 </head>
 <body>
     <div class="main">
-       <h1>Expenses Tracking</h1>
-        <form class="container", id="form">
-            <input type="text" name="Description" placeholder="Description" id="description"/>
-            <input type="number" name="Amount" placeholder="Amount" id="amount"/>
-            <button type="submit">Add Expenses</button>
-        </form>
-        <ul id="expense_list"></ul>
-        <div class="summary">
-        Total:Rs<span id="total">0.00</span>
+        <div class="container">
+<form  id="form" class="form">
+        <input type="Text" placeholder="Description" id="description">
+        <input type="number" placeholder="Amount" id="amount">
+        <button type="submit">Add Expenses</button>
+        <ul id="expenses_list"></ul>
+       
+    </form>
+     <div class="total">
+        Total : Rs<span id="total">00.0</span>
         </div>
-     </div>
+        <div>
+            <button onclick="downloadList()">Download list</button>
+        </div>
     
-<script>
-    const Expenses_Tracking_form=document.getElementById("form");
-    const descriptionInput=document.getElementById("description");
-    const amountInput=document.getElementById("amount");
-    const expenseList = document.getElementById("expense_list");
-    const totalDisplay = document.getElementById("total");
-//Define localStorage
-     let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    </div>
+    </div>
+    
 
-     function saveExpenses() {
-      localStorage.setItem("expenses", JSON.stringify(expenses));
-    }
+    <script>
+        const form = document.getElementById("form")
+        const descriptionInput = document.getElementById("description")
+        const amountInput = document.getElementById("amount")
+        const expenseList = document.getElementById("expenses_list")
+        const totalDisplay = document.getElementById("total")
 
-    function renderExpenses() {
-      expenseList.innerHTML = "";
-      let total = 0;
+        let storage = JSON.parse(localStorage.getItem("storage")) ||[]
 
-      expenses.forEach((expense, i) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span>${expense.description} | ${expense.amount.toFixed(2)} | ${expense.date}</span>
-          <span class="actions">
-            <button onclick="editExpense(${i})">Edit</button>
-            <button onclick="deleteExpense(${i})">Delete</button>
-          </span>
-        `;
-        expenseList.appendChild(li);
-        total += expense.amount;
-      });
-      totalDisplay.textContent = total.toFixed(2);
-    }
+       function saveExpense(){
+        localStorage.setItem("storage",JSON.stringify(storage))
+       } 
+       function renderExpense(){
+        expenseList.innerHTML= "";
+       let  total=0;
+        storage.forEach((expense,i) => {
+            const li = document.createElement("li");
+            li.innerHTML=`
+            <div class="expenses_list">
+                <div id="des"><span>${expense.description} </span><span>${expense.amount} </span><span> ${expense.date}</span></div>
+                <div id="button">
+                    <button onclick ="editExpense(${i})" id="edit">Edit</button>
+                    <button onclick ="deleteExpense(${i})" id="delete">Delete</button>
+                </div>
+            </div>
+            `;
+            expenseList.appendChild(li);
+            total+=expense.amount;
+        });
+        totalDisplay.textContent=total.toFixed(2);
+       }
+       function downloadList(){
+        let csv="Categories,Amount,Date\n" 
 
-    Expenses_Tracking_form.addEventListener("submit",function(e){
-        e.preventDefault();
-        const description =descriptionInput.value.trim();
-        const amount=parseFloat(amountInput.value);
+        storage.forEach(expense=>{csv+=`${expense.description},${expense.amount},${expense.date}\n`;});
 
-        if(!description || isNaN(amount) || amount<=0)
-        {
-            alert("Enter positive amount");
-            return;
+        const blob =new Blob([csv],{type:"text/csv"});
+        const url=URL.createObjectURL(blob);
+
+        const a=document.createElement("a");
+        a.href = url;
+        a.download = "expense.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+       }
+      
+
+        form.addEventListener("submit",function(e){
+            e.preventDefault();
+              const description=descriptionInput.value.trim()
+              const amount =parseFloat(amountInput.value)
+              
+              if(!description || isNaN(amount) || amount<=0)
+              {
+                alert("please, enter valied imformation");
+                return;
+              }
+
+             const expense ={
+               description,
+               amount,
+               date:new Date().toLocaleDateString()
+              }
+              storage.push(expense)
+                saveExpense();
+                renderExpense();
+                form.reset();
+              
+
+        });
+        window.deleteExpense= function(i){
+            storage.splice(i,1)
+            saveExpense();
+            renderExpense();
+
         }
-        const expense={
-            description,
-            amount,
-            date:new Date().toLocaleDateString()
-            
-        }
-     
-    
-        expenses.push(expense);
-        saveExpenses();
-        renderExpenses();
-        Expenses_Tracking_form.reset();
-    });
-    
-    //delete option
-    window.deleteExpense=function(i)
-    {
-        expenses.splice(i,1);
-        saveExpenses();
-        renderExpenses();
-    };
-    
-     //editing option
-     window.editExpense=function(i){
-        const expense = expenses[i];
-        const newDescription = prompt("Edit Description:", expense.description)
-        const newAmount = parseFloat(prompt("Edit Amount",expense.amount))
-        if(!newDescription || isNaN(newAmount) || newAmount<=0)
-        {
-            alert("enter valid Description and amount")
-            return;
-        }
-        expenses[i].description=newDescription
-        expenses[i].amount=newAmount
-        saveExpenses();
-        renderExpenses();
-     };
-     renderExpenses();
+        window.editExpense = function(i){
+            const newdescription =prompt("edit description",storage[i].description)
+            const newamount =parseFloat(prompt("edit amount",storage[i].amount))
+            if (!newdescription || isNaN(newamount) || newamount<=0 )
+            {
+                alert("please, enter valid  input")
+                return;
+            }
+            storage[i].description =newdescription
+            storage[i].amount = newamount
+            saveExpense();
+            renderExpense();
 
-</script>
+        }
+        renderExpense();
+    </script>
 </body>
 </html>
